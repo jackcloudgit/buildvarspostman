@@ -1,0 +1,22 @@
+name: Postman Tests
+
+on:
+  repository_dispatch:
+    types: [postman-tests-trigger]
+
+jobs:
+  run-postman:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Install Postman CLI
+        run: |
+          curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
+          export PATH=$HOME/.postman:$PATH
+
+      - name: Run Collection
+        run: |
+          postman collection run "./postman/test-api-collection.json"
