@@ -1,0 +1,17 @@
+name: Run Postman Tests
+
+on:
+  repository_dispatch:
+    types: [postman-tests-trigger]
+
+jobs:
+  postman-test:
+    name: Run Postman Collection
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Simulate Postman Test
+        run: |
+          echo "Running postman tests..."
+          sleep 3
+          echo "Tests complete ✅"

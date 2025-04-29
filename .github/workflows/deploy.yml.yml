@@ -1,50 +1,31 @@
-name: Deploy App
+name: Deploy Application with Conditional Postman
 
 on:
   workflow_dispatch:
 
 jobs:
   deploy:
-    name: Deploy via Helm/Flux
+    name: Deploy App
     runs-on: ubuntu-latest
     outputs:
-      deploy_status: ${{ steps.set_status.outputs.success }}
+      deploy_status: ${{ steps.set_status.outputs.status }}
 
     steps:
-      - name: Checkout Repo
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Simulate Helm Deployment (Replace with actual logic)
+      - name: Simulate Helm Deployment
         run: |
-          echo "Deploying app..."
-          # Simulate deployment logic
-          echo "success=true" >> $GITHUB_ENV
+          echo "Deploying application..."
+          sleep 5
+          echo "Deployment success"
 
       - name: Set Deployment Status Output
         id: set_status
-        run: echo "::set-output name=success::true"
+        run: echo "status=true" >> $GITHUB_OUTPUT
 
   check-postman-flag:
     name: Check Postman Flag and Trigger
-    needs: deploy
     runs-on: ubuntu-latest
-    if: needs.deploy.outputs.deploy_status == 'true'
-
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-
-      - name: Read build-vars.json
-        id: readvars
-        run: |
-          postman_flag=$(jq -r '.postman' build-vars.json)
-          echo "postman_flag=$postman_flag" >> $GITHUB_ENV
-          echo "::set-output name=postman::$postman_flag"
-
-      - name: Trigger Postman Workflow
-        if: steps.readvars.outputs.postman == 'true'
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          event-type: postman-tests-trigger
+    needs: deploy
+    if: needs
