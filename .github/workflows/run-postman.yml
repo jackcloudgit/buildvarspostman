@@ -12,6 +12,6 @@ jobs:
     steps:
       - name: Simulate Postman Test
         run: |
-          echo "Running postman tests..."
+          echo "Running Postman collection..."
           sleep 3
-          echo "Tests complete ✅"
+          echo "✅ Postman tests complete!"

@@ -25,7 +25,29 @@ jobs:
         run: echo "status=true" >> $GITHUB_OUTPUT
 
   check-postman-flag:
-    name: Check Postman Flag and Trigger
+    name: Check Flag and Trigger Postman Workflow
     runs-on: ubuntu-latest
     needs: deploy
-    if: needs
+    if: needs.deploy.outputs.deploy_status == 'true'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Read Postman Flag from JSON
+        id: readvars
+        run: |
+          postman_flag=$(jq -r '.postman' build-vars.json)
+          echo "postman_flag=$postman_flag" >> $GITHUB_OUTPUT
+
+      - name: Trigger Postman Workflow
+        if: steps.readvars.outputs.postman_flag == 'true'
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          event-type: postman-tests-trigger
+
+      - name: Skip Trigger (Optional)
+        if: steps.readvars.outputs.postman_flag != 'true'
+        run: echo "Postman flag is false. Skipping postman workflow trigger."
